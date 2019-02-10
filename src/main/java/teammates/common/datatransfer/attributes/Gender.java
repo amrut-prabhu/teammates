@@ -14,9 +14,9 @@ public enum Gender {
     OTHER,
     ;
 
-    public static Gender getGenderValue(String gender) {
+    public static Gender getGenderEnumValue(String gender) {
         try {
-            return Gender.valueOf(gender);
+            return Gender.valueOf(gender.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
             return Gender.OTHER;
         }
