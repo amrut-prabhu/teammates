@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReCaptcha2Component } from 'ngx-captcha';
 import { HttpRequestService } from '../../../services/http-request.service';
 import { StatusMessageService } from '../../../services/status-message.service';
-import { MessageOutput } from '../../../types/api-output';
+import { EmailRestoreResponse } from '../../../types/api-output';
 import { ErrorMessageOutput } from '../../error-message-output';
 
 /**
@@ -42,24 +42,26 @@ export class LinkRecoveryPageComponent implements OnInit {
    * Sends the feedback session links to the registered email address.
    */
   onSubmitLinkRecovery(linkRecoveryForm: FormGroup): void {
-    const recoveryEmail: string = linkRecoveryForm.controls.email.value;
-
-    if (!recoveryEmail || this.captchaResponse === undefined) {
+    if (!this.formLinkRecovery.valid || this.captchaResponse === undefined) {
       this.statusMessageService.showErrorMessage(
-          'Please enter an email address and click the reCAPTCHA before submitting.');
+          'Please enter a valid email address and click the reCAPTCHA before submitting.');
       return;
     }
 
     const paramsMap: { [key: string]: string } = {
-      recoveryemail: recoveryEmail,
+      recoveryemail: linkRecoveryForm.controls.email.value,
       captcharesponse: this.captchaResponse,
     };
 
     this.httpRequestService.get('/recovery', paramsMap)
-      .subscribe((resp: MessageOutput) => {
-        this.statusMessageService.showSuccessMessage(resp.message);
+      .subscribe((resp: EmailRestoreResponse) => {
+        if (resp.status) {
+          this.statusMessageService.showSuccessMessage(resp.message);
+        } else {
+          this.statusMessageService.showErrorMessage(resp.message);
+        }
 
-        // Reset input field and reCAPTCHA
+        // Reset email input field and reCAPTCHA
         (this.formLinkRecovery = this.formBuilder.group({
           email: ['', Validators.required],
           recaptcha: ['', Validators.required],
