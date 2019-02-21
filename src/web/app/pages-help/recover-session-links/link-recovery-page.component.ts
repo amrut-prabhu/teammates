@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReCaptcha2Component } from 'ngx-captcha';
+import { environment } from '../../../environments/environment';
 import { HttpRequestService } from '../../../services/http-request.service';
 import { StatusMessageService } from '../../../services/status-message.service';
 import { EmailRestoreResponse } from '../../../types/api-output';
@@ -18,12 +19,12 @@ export class LinkRecoveryPageComponent implements OnInit {
 
   // ngx-recaptcha2 element properties
   captchaSuccess: boolean = false;
-  captchaResponse?: string;
+  recaptchaResponse?: string;
   size: 'compact' | 'normal' = 'normal';
   lang: string = 'en';
 
   formLinkRecovery!: FormGroup;
-  readonly siteKey: string = '6LeZSZEUAAAAAO-xCzi314NoCgJILEH9qzFuer3P';
+  readonly captchaSiteKey: string = environment.captchaSiteKey;
 
   @ViewChild('captchaElem') captchaElem!: ReCaptcha2Component;
 
@@ -42,7 +43,7 @@ export class LinkRecoveryPageComponent implements OnInit {
    * Sends the feedback session links to the registered email address.
    */
   onSubmitLinkRecovery(linkRecoveryForm: FormGroup): void {
-    if (!this.formLinkRecovery.valid || this.captchaResponse === undefined) {
+    if (!this.formLinkRecovery.valid || this.recaptchaResponse === undefined) {
       this.statusMessageService.showErrorMessage(
           'Please enter a valid email address and click the reCAPTCHA before submitting.');
       return;
@@ -50,7 +51,7 @@ export class LinkRecoveryPageComponent implements OnInit {
 
     const paramsMap: { [key: string]: string } = {
       recoveryemail: linkRecoveryForm.controls.email.value,
-      captcharesponse: this.captchaResponse,
+      recaptcharesponse: this.recaptchaResponse,
     };
 
     this.httpRequestService.get('/recovery', paramsMap)
@@ -91,6 +92,6 @@ export class LinkRecoveryPageComponent implements OnInit {
    */
   handleSuccess(captchaResponse: string): void {
     this.captchaSuccess = true;
-    this.captchaResponse = captchaResponse;
+    this.recaptchaResponse = captchaResponse;
   }
 }
