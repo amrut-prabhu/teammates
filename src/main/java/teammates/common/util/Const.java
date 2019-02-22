@@ -818,6 +818,7 @@ public final class Const {
         public static final String RESPONDENT_IS_TO_BE_REMOVED = "respondentistoberemoved";
 
         public static final String RECOVERY_EMAIL = "recoveryemail";
+        public static final String USER_RECAPTCHA_RESPONSE = "recaptcharesponse";
         public static final String RESTORE_KEY = "restorekey";
 
         //Parameters for checking persistence of data during Eventual Consistency

@@ -2,9 +2,9 @@ package teammates.ui.webapi.action;
 
 import teammates.common.util.Const;
 import teammates.common.util.EmailWrapper;
+import teammates.common.util.RecaptchaVerifier;
 import teammates.logic.api.EmailGenerator;
 import teammates.ui.webapi.output.EmailRestoreResponseData;
-
 
 /**
  * Action specifically created for confirming email and sending recovery link.
@@ -24,6 +24,12 @@ public class LinkRecoveryAction extends Action {
     @Override
     public ActionResult execute() {
         String requestedEmail = getNonNullRequestParamValue(Const.ParamsNames.RECOVERY_EMAIL);
+        String userRecaptchaResponse = getNonNullRequestParamValue(Const.ParamsNames.USER_RECAPTCHA_RESPONSE);
+
+        if (!RecaptchaVerifier.isVerificationSuccessful(userRecaptchaResponse)) {
+            return new JsonResult(new EmailRestoreResponseData(false, "reCAPTCHA verification was unsuccessful."));
+        }
+
         boolean hasStudentsWithRestoreEmail = !logic.getAllStudentForEmail(requestedEmail).isEmpty();
 
         if (hasStudentsWithRestoreEmail) {
